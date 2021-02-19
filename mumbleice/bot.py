@@ -29,8 +29,7 @@ class MumbleConnector:
         self.channel = channel
         self.mumble = pymumble.Mumble(server, username,
                                       port, password,
-                                      reconnect=True,
-                                      stereo=NUM_CHANNELS==2)
+                                      reconnect=True)
         self.logger = logging.getLogger(__name__)
 
     def start(self):
@@ -73,11 +72,10 @@ class IcecastConnector:
     def start(self):
         args = (
             ffmpeg
-            .input('pipe:', format='s16le', ar=SAMPLES_PER_SECOND, ac=1)
+            .input('pipe:', format='s16le', ar=SAMPLES_PER_SECOND, ac=NUM_CHANNELS)
             .output(self.icecast_string, codec="libmp3lame", f='mp3', content_type='audio/mpeg', **{'b:a': '64k'})
             .compile()
         )
-        print(args)
         self.icecast_stream = subprocess.Popen(args, stdin=subprocess.PIPE)
         self.logger.info('Icecast stream started')
 
@@ -108,8 +106,6 @@ class Bot:
         self.mumble.start()
         self.logger.info('Connected to Mumble')
         self.logger.info('Started MumbleIce bot')
-        #TODO: remove after testing
-        self.connect_icecast()
         try:
             while True:
                 time.sleep(1)
