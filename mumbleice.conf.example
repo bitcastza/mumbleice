@@ -1,0 +1,14 @@
+[mumble]
+server = mumble.server
+port = 64738
+username = live-streamer
+password = server-password
+channel = Root
+command-prefix = !
+
+[icecast]
+server = icecast.server
+port = 8000
+username = source
+password = hackme
+mount-point = /mumble
