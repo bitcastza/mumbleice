@@ -33,13 +33,13 @@ class MumbleConnector:
                                       port, password,
                                       reconnect=True)
         self.logger = logging.getLogger(__name__)
-        self.mumble.callbacks.set_callback(
-            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
-            self.start)
 
     def start(self):
         self.mumble.start()
         self.mumble.is_ready()
+        self.mumble.callbacks.set_callback(
+            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
+            self.start)
         self.logger.info('Mumble client started')
         channel = self.mumble.channels.find_by_name(self.channel)
         if channel == None:
@@ -48,6 +48,9 @@ class MumbleConnector:
             channel.move_in()
 
     def stop(self):
+        self.mumble.callbacks.remove_callback(
+            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
+            self.start)
         self.mumble.stop()
         self.logger.info('Disconnected from Mumble')
 
@@ -74,6 +77,7 @@ class IcecastConnector:
         self.logger = logging.getLogger(__name__)
         self.icecast_string = f'icecast://{username}:{password}@{server}:{port}{mount_point}'
         self.timer = Watchdog(0.5, self.write_silence)
+        self.icecast_stream = None
 
     def start(self):
         args = (
@@ -104,7 +108,8 @@ class IcecastConnector:
 
     def stop(self):
         self.timer.stop()
-        self.icecast_stream.stdin.close()
+        if self.icecast_stream:
+            self.icecast_stream.stdin.close()
         self.logger.info('Disconnected from Icecast')
 
 class Bot:

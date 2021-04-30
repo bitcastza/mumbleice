@@ -16,6 +16,7 @@
 import argparse
 import configparser
 import logging
+import os
 import sys
 
 from .bot import Bot, IcecastConnector, MumbleConnector
@@ -37,6 +38,8 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     try:
         config = configparser.ConfigParser()
+        if not os.path.isfile(args.config):
+            raise FileNotFoundError()
         config.read(args.config)
 
         cfg = config['mumble']
@@ -52,5 +55,9 @@ if __name__ == '__main__':
         bot.run()
     except KeyError:
         logger.error('Error reading config file')
+        parser.print_help(file=sys.stderr)
+        exit(1)
+    except FileNotFoundError:
+        logger.error(f'Config file {args.config} does not exist')
         parser.print_help(file=sys.stderr)
         exit(1)
