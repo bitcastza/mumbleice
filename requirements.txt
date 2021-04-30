@@ -1,4 +1,3 @@
 pymumble
-python-shout
-git+https://github.com/TeamPyOgg/PyOgg@master
-
+ffmpeg-python
+pydub

@@ -16,6 +16,7 @@
 import argparse
 import configparser
 import logging
+import sys
 
 from .bot import Bot, IcecastConnector, MumbleConnector
 
@@ -33,17 +34,23 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    config = configparser.ConfigParser()
-    config.read(args.config)
+    logger = logging.getLogger(__name__)
+    try:
+        config = configparser.ConfigParser()
+        config.read(args.config)
 
-    cfg = config['mumble']
-    mumble = MumbleConnector(cfg['server'], cfg.getint('port'),
-                             cfg['username'], cfg['password'],
-                             cfg['channel'])
-    cfg = config['icecast']
-    icecast = IcecastConnector(cfg['server'], cfg.getint('port'),
-                               cfg['username'], cfg['password'],
-                               cfg['mount-point'])
+        cfg = config['mumble']
+        mumble = MumbleConnector(cfg['server'], cfg.getint('port'),
+                                 cfg['username'], cfg['password'],
+                                 cfg['channel'])
+        cfg = config['icecast']
+        icecast = IcecastConnector(cfg['server'], cfg.getint('port'),
+                                   cfg['username'], cfg['password'],
+                                   cfg['mount-point'])
 
-    bot = Bot(mumble, icecast, config['mumble']['command-prefix'])
-    bot.run()
+        bot = Bot(mumble, icecast, config['mumble']['command-prefix'])
+        bot.run()
+    except KeyError:
+        logger.error('Error reading config file')
+        parser.print_help(file=sys.stderr)
+        exit(1)

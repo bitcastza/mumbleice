@@ -19,6 +19,8 @@ import time
 import ffmpeg
 import subprocess
 from threading import Thread
+from pydub import AudioSegment
+from .watchdog import Watchdog
 
 SAMPLES_PER_SECOND = 48000
 NUM_CHANNELS = 1
@@ -68,6 +70,7 @@ class IcecastConnector:
     def __init__(self, server, port, username, password, mount_point):
         self.logger = logging.getLogger(__name__)
         self.icecast_string = f'icecast://{username}:{password}@{server}:{port}{mount_point}'
+        self.timer = Watchdog(0.5, self.write_silence)
 
     def start(self):
         args = (
@@ -76,14 +79,28 @@ class IcecastConnector:
             .output(self.icecast_string, codec="libmp3lame", f='mp3', content_type='audio/mpeg', **{'b:a': '64k'})
             .compile()
         )
+        # Write silence if no audio is received from Mumble
+        self.timer.start()
         self.icecast_stream = subprocess.Popen(args, stdin=subprocess.PIPE)
         self.logger.info('Icecast stream started')
 
+    def write_silence(self):
+        self.logger.debug('No audio received from Mumble, writing silence to Icecast')
+        silence_audio = AudioSegment.silent(duration=500, frame_rate=SAMPLES_PER_SECOND)
+        if NUM_CHANNELS == 2:
+            silence_audio = AudioSegment.from_mono_audiosegments(silence_audio, silence_audio)
+        self.write(silence_audio.raw_data)
+
     def write(self, pcm):
+        self.timer.reset()
+        if self.icecast_stream.poll():
+            self.logger.warning('Icecast stream disconnected unexpectedly, reconnecting...')
+            self.start()
         self.logger.debug('Writing data to FFMpeg')
         self.icecast_stream.stdin.write(pcm)
 
     def stop(self):
+        self.timer.stop()
         self.icecast_stream.stdin.close()
         self.logger.info('Disconnected from Icecast')
 
@@ -121,7 +138,7 @@ class Bot:
             msg = msg.split(' ')
             cmd = self.commands.get(msg[0])
             if cmd == None:
-                self.logger.debug('Not recognized command: {self.command_prefix}{message.message}')
+                self.logger.debug(f'Not recognized command: {self.command_prefix}{message.message}')
                 self.mumble.send_message('Command not recognised')
                 return
             cmd()
