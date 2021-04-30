@@ -33,6 +33,9 @@ class MumbleConnector:
                                       port, password,
                                       reconnect=True)
         self.logger = logging.getLogger(__name__)
+        self.mumble.callbacks.set_callback(
+            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
+            self.start)
 
     def start(self):
         self.mumble.start()
