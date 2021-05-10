@@ -1,0 +1,13 @@
+mumble:
+  server: !ENV ${MUMBLE_SERVER}
+  port: !ENV ${MUMBLE_PORT:64738}
+  username: !ENV ${MUMBLE_USERNAME:live-streamer}
+  password: !ENV ${MUMBLE_PASSWORD}
+  channel: !ENV ${MUMBLE_CHANNEL:Root}
+  command_prefix: !ENV ${MUMBLE_COMMAND_PREFIX:!}
+icecast:
+  server: !ENV ${ICECAST_SERVER}
+  port: !ENV ${ICECAST_PORT:8000}
+  username: !ENV ${ICECAST_USERNAME:source}
+  password: !ENV ${ICECAST_PASSWORD:hackme}
+  mount_point: !ENV ${ICECAST_MOUNT_POINT:/mumble}

@@ -1,3 +1,4 @@
 *.pyc
 __pycache__/
-mumbleice.conf
+mumbleice.yml
+mumbleice.yaml

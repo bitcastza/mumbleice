@@ -14,18 +14,18 @@
 # along with MumbleIce. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import argparse
-import configparser
 import logging
 import os
 import sys
 
+from pyaml_env import parse_config, BaseConfig
 from .bot import Bot, IcecastConnector, MumbleConnector
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config',
                         help='the configuration file to use',
-                        default='mumbleice.conf')
+                        default=os.environ.get('MUMBLEICE_CONFIG_FILE', 'mumbleice.yml'))
     parser.add_argument('-v', '--verbose',
                         help='show debug information',
                         action='store_true')
@@ -37,21 +37,20 @@ if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
     try:
-        config = configparser.ConfigParser()
         if not os.path.isfile(args.config):
             raise FileNotFoundError()
-        config.read(args.config)
+        config = BaseConfig(parse_config(args.config))
 
-        cfg = config['mumble']
-        mumble = MumbleConnector(cfg['server'], cfg.getint('port'),
-                                 cfg['username'], cfg['password'],
-                                 cfg['channel'])
-        cfg = config['icecast']
-        icecast = IcecastConnector(cfg['server'], cfg.getint('port'),
-                                   cfg['username'], cfg['password'],
-                                   cfg['mount-point'])
+        cfg = config.mumble
+        mumble = MumbleConnector(cfg.server, int(cfg.port),
+                                 cfg.username, cfg.password,
+                                 cfg.channel)
+        cfg = config.icecast
+        icecast = IcecastConnector(cfg.server, int(cfg.port),
+                                   cfg.username, cfg.password,
+                                   cfg.mount_point)
 
-        bot = Bot(mumble, icecast, config['mumble']['command-prefix'])
+        bot = Bot(mumble, icecast, config.mumble.command_prefix)
         bot.run()
     except KeyError:
         logger.error('Error reading config file')
