@@ -6,8 +6,9 @@ This is a mumble bot for streaming audio from a Mumble room to Icecast.
 
 ## Production (Docker)
 The Docker image is recommended for running in production. The configuration
-file can be mounted to `/mumbleice.yml`. The file location can be changed
-with the `MUMBLEICE_CONFIG_FILE` environment variable.
+file can be mounted to `/mumbleice.yml` or configuration can be done using
+environment variables. The file location can be changed with the
+`MUMBLEICE_CONFIG_FILE` environment variable.
 
 All configuration options can be set using environment variables:
 
