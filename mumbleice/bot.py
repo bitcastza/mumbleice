@@ -24,6 +24,8 @@ from .watchdog import Watchdog
 
 SAMPLES_PER_SECOND = 48000
 NUM_CHANNELS = 1
+SILENCE_DURATION = 0.5 #seconds
+MAX_SILENCE_DURATION = 30 #seconds
 
 
 class MumbleConnector:
@@ -76,8 +78,9 @@ class IcecastConnector:
     def __init__(self, server, port, username, password, mount_point):
         self.logger = logging.getLogger(__name__)
         self.icecast_string = f'icecast://{username}:{password}@{server}:{port}{mount_point}'
-        self.timer = Watchdog(0.5, self.write_silence)
+        self.timer = Watchdog(SILENCE_DURATION, self.write_silence)
         self.icecast_stream = None
+        self.silence_count = 0
 
     def start(self):
         args = (
@@ -97,6 +100,10 @@ class IcecastConnector:
         if NUM_CHANNELS == 2:
             silence_audio = AudioSegment.from_mono_audiosegments(silence_audio, silence_audio)
         self.write(silence_audio.raw_data)
+        self.silence_count = self.silence_count + SILENCE_DURATION
+        if self.silence_count > MAX_SILENCE_DURATION:
+            self.logger.warn(f'No audio received from Mumble for the last {MAX_SILENCE_DURATION} seconds. Disconnecting from Icecast...')
+            self.stop()
 
     def write(self, pcm):
         self.timer.reset()
@@ -104,7 +111,11 @@ class IcecastConnector:
             self.logger.warning('Icecast stream disconnected unexpectedly, reconnecting...')
             self.start()
         self.logger.debug('Writing data to FFMpeg')
-        self.icecast_stream.stdin.write(pcm)
+        try:
+            self.icecast_stream.stdin.write(pcm)
+        except ValueError:
+            # Stream has been stopped and closed.
+            pass
 
     def stop(self):
         self.timer.stop()
