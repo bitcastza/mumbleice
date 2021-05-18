@@ -120,8 +120,7 @@ class IcecastConnector:
         try:
             self.icecast_stream.stdin.write(pcm)
         except ValueError:
-            # Stream has been stopped and closed.
-            pass
+            self.logger.debug('Attempt to write to closed Icecast stream')
 
     def stop(self):
         if self.icecast_stream:
