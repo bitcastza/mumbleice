@@ -1,5 +1,5 @@
 ###########################################################################
-# MumbleIce is Copyright (C) 2021 Kyle Robbertze <kyle@paddatrapper.com>
+# MumbleIce is Copyright (C) 2021 Kyle Robbertze <kyle@bitcast.co.za>
 #
 # MumbleIce is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, or
@@ -38,3 +38,11 @@ class Watchdog(Exception):
 
     def default_handler(self):
         raise self
+
+
+class SilenceError(Exception):
+    pass
+
+
+class ConfigurationError(Exception):
+    pass

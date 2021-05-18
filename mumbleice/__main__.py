@@ -1,5 +1,5 @@
 ###########################################################################
-# MumbleIce is Copyright (C) 2021 Kyle Robbertze <kyle@paddatrapper.com>
+# MumbleIce is Copyright (C) 2021 Kyle Robbertze <kyle@bitcast.co.za>
 #
 # MumbleIce is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, or
@@ -21,6 +21,9 @@ import sys
 from pyaml_env import parse_config, BaseConfig
 from .bot import Bot, IcecastConnector, MumbleConnector
 
+LOGGING_FORMAT = '%(asctime)s - %(levelname)s (%(name)s): %(message)s'
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config',
@@ -31,9 +34,9 @@ if __name__ == '__main__':
                         action='store_true')
     args = parser.parse_args()
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG, format=LOGGING_FORMAT, datefmt=DATE_FORMAT)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT, datefmt=DATE_FORMAT)
 
     logger = logging.getLogger(__name__)
     try:
