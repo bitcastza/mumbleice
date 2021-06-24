@@ -26,6 +26,7 @@ SAMPLES_PER_SECOND = 48000
 NUM_CHANNELS = 1
 MAX_SILENCE_DURATION = 30*1000 #30 seconds
 BUFFER_DURATION = 10 # ms Must be 10ms or a multiple thereof
+WATCHDOG_RATE = 5 # ms
 
 
 class MumbleConnector:
@@ -71,6 +72,7 @@ class MumbleConnector:
 
     def get_audio(self, buffer_size):
         self.logger.debug('Fetching mumble audio')
+        audio_length = buffer_size/1000
         audio = AudioSegment.silent(duration=buffer_size, frame_rate=SAMPLES_PER_SECOND)
         silence = True
         for session_id, user in self.mumble.users.items():
@@ -78,7 +80,7 @@ class MumbleConnector:
             if user_audio.is_sound():
                 silence = False
                 audio_data = AudioSegment(
-                    data=user_audio.get_sound(buffer_size/1000).pcm,
+                    data=user_audio.get_sound(audio_length).pcm,
                     sample_width=2, # bytes => 16 bit
                     frame_rate=SAMPLES_PER_SECOND,
                     channels=1
@@ -106,9 +108,20 @@ class IcecastConnector:
         args = (
             ffmpeg
             .input('pipe:', format='s16le', ar=SAMPLES_PER_SECOND, ac=NUM_CHANNELS)
-            .output(self.icecast_string, codec="libmp3lame", f='mp3', content_type='audio/mpeg', **{'b:a': '192k'})
+            .output(self.icecast_string,
+                    codec="libmp3lame",
+                    f='mp3',
+                    ac=2,
+                    legacy_icecast=1,
+                    sample_fmt='fltp',
+                    content_type='audio/mpeg',
+                    **{
+                        'b:a': '132k',
+                    })
             .compile()
         )
+        args.insert(1, '-re')
+        print(args)
         self.icecast_stream = subprocess.Popen(args, stdin=subprocess.PIPE)
         self.logger.info('Icecast stream started')
 
@@ -142,7 +155,7 @@ class Bot:
             'connect': self.connect_icecast,
             'disconnect': self.disconnect_icecast,
         }
-        self.timer = Watchdog(BUFFER_DURATION/1000, self.write_audio)
+        self.timer = Watchdog(WATCHDOG_RATE/1000, self.write_audio)
 
     def run(self):
         self.logger.debug('Starting MumbleIce bot')
