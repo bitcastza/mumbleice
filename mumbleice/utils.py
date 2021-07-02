@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MumbleIce. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import re
 from threading import Timer
 
 class Watchdog(Exception):
@@ -46,3 +47,8 @@ class SilenceError(Exception):
 
 class ConfigurationError(Exception):
     pass
+
+
+def parse_message(message):
+    message = re.sub('<[^<]+?>', '', message)
+    return message.lower()

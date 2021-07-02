@@ -20,7 +20,7 @@ import ffmpeg
 import subprocess
 from threading import Thread
 from pydub import AudioSegment
-from .utils import Watchdog, SilenceError, ConfigurationError
+from .utils import Watchdog, SilenceError, ConfigurationError, parse_message
 
 SAMPLES_PER_SECOND = 48000
 NUM_CHANNELS = 1
@@ -173,7 +173,7 @@ class Bot:
 
     def mumble_message(self, message):
         self.logger.info(f'Message received: {message.message}')
-        msg = message.message
+        msg = parse_message(message.message)
         if msg.startswith(self.command_prefix) and len(msg) > len(self.command_prefix):
             msg = msg[len(self.command_prefix):]
             msg = msg.split(' ')
