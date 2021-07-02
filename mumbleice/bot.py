@@ -103,6 +103,7 @@ class IcecastConnector:
         self.logger = logging.getLogger(__name__)
         self.icecast_string = f'icecast://{username}:{password}@{server}:{port}{mount_point}'
         self.icecast_stream = None
+        self.is_connected = False
 
     def start(self):
         args = (
@@ -121,24 +122,27 @@ class IcecastConnector:
             .compile()
         )
         args.insert(1, '-re')
-        print(args)
         self.icecast_stream = subprocess.Popen(args, stdin=subprocess.PIPE)
         self.logger.info('Icecast stream started')
+        self.is_connected = True
 
     def write(self, pcm):
         if self.icecast_stream.poll():
             self.logger.warning('Icecast stream disconnected unexpectedly, reconnecting...')
+            self.is_connected = False
             self.start()
         self.logger.debug('Writing data to FFMpeg')
         try:
             self.icecast_stream.stdin.write(pcm)
         except ValueError:
             self.logger.debug('Attempt to write to closed Icecast stream')
+            self.is_connected = False
 
     def stop(self):
         if self.icecast_stream:
             self.icecast_stream.stdin.close()
         self.logger.info('Disconnected from Icecast')
+        self.is_connected = False
 
 class Bot:
     def __init__(self, mumble, icecast, command_prefix):
@@ -185,16 +189,22 @@ class Bot:
             cmd()
 
     def connect_icecast(self):
-        self.icecast.start()
-        self.mumble.set_get_sound(True)
-        self.mumble.send_message('Icecast stream started')
-        self.timer.start()
+        if self.icecast.is_connected:
+            self.mumble.send_message('Icecast already connected')
+        else:
+            self.icecast.start()
+            self.mumble.set_get_sound(True)
+            self.mumble.send_message('Icecast stream started')
+            self.timer.start()
 
     def disconnect_icecast(self):
-        self.timer.stop()
-        self.icecast.stop()
-        self.mumble.send_message('Icecast streaming stopped')
-        self.mumble.set_get_sound(False)
+        if self.icecast.is_connected:
+            self.timer.stop()
+            self.icecast.stop()
+            self.mumble.send_message('Icecast streaming stopped')
+            self.mumble.set_get_sound(False)
+        else:
+            self.mumble.send_message('Icecast already disconnected')
 
     def write_audio(self):
         try:
