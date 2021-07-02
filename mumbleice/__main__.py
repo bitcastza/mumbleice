@@ -24,7 +24,7 @@ from .bot import Bot, IcecastConnector, MumbleConnector
 LOGGING_FORMAT = '%(asctime)s - %(levelname)s (%(name)s): %(message)s'
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-if __name__ == '__main__':
+def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config',
                         help='the configuration file to use',
@@ -63,3 +63,6 @@ if __name__ == '__main__':
         logger.error(f'Config file {args.config} does not exist')
         parser.print_help(file=sys.stderr)
         exit(1)
+
+if __name__ == '__main__':
+    run()
