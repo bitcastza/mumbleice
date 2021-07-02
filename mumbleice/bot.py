@@ -64,6 +64,8 @@ class MumbleConnector:
             fn)
 
     def set_get_sound(self, receive):
+        self.logger.debug('Reset silence count')
+        self.silence_count = 0
         self.mumble.set_receive_sound(receive)
 
     def send_message(self, message):
@@ -94,6 +96,7 @@ class MumbleConnector:
         else:
             self.silence_count = 0
         if self.silence_count > MAX_SILENCE_DURATION:
+            self.silence_count = 0
             raise SilenceError()
         return audio.raw_data
 
