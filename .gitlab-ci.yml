@@ -34,4 +34,4 @@ docker-tag-image:
     - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
   only:
-    - tag
+    - tags
