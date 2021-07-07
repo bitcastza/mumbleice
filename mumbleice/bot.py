@@ -34,6 +34,7 @@ class Bot:
         self.commands = {
             'connect': self.connect_icecast,
             'disconnect': self.disconnect_icecast,
+            'status': self.show_icecast_status,
         }
         self.timer = Watchdog(WATCHDOG_RATE/1000, self.write_audio)
 
@@ -91,3 +92,9 @@ class Bot:
             self.logger.warning(f'No audio received from Mumble for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
             self.mumble.send_message(f'No audio received for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
             self.disconnect_icecast()
+
+    def show_icecast_status(self):
+        if self.icecast.is_connected:
+            self.mumble.send_message('Icecast is <b>connected</b> and streaming')
+        else:
+            self.mumble.send_message('Icecast is <b>disconnected</b> and not streaming')
