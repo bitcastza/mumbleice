@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mumbleice',
-    version='1.0.0',
+    version='1.0.1',
     description='Mumble bot for streaming to Icecast',
     long_description='A Mumble bot that will stream a room to a pre-configured icecast mount-point',
     url='https://gitlab.com/bitcast/mumbleice',
