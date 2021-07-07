@@ -26,7 +26,10 @@ class Watchdog(Exception):
         self.timer = Timer(self.timeout, self.handler)
 
     def start(self):
-        self.timer.start()
+        try:
+            self.timer.start()
+        except RuntimeError:
+            self.reset()
 
     def reset(self):
         self.timer.cancel()

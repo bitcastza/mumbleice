@@ -138,7 +138,7 @@ class IcecastConnector:
         try:
             self.icecast_stream.stdin.write(pcm)
         except ValueError:
-            self.logger.debug('Attempt to write to closed Icecast stream')
+            self.logger.debug('Attempted to write to closed Icecast stream')
             self.is_connected = False
 
     def stop(self):
@@ -201,8 +201,8 @@ class Bot:
             self.timer.start()
 
     def disconnect_icecast(self):
+        self.timer.stop()
         if self.icecast.is_connected:
-            self.timer.stop()
             self.icecast.stop()
             self.mumble.send_message('Icecast streaming stopped')
             self.mumble.set_get_sound(False)
