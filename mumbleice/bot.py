@@ -14,138 +14,11 @@
 # along with MumbleIce. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import logging
-import pymumble_py3 as pymumble
 import time
-import ffmpeg
-import subprocess
-from threading import Thread
-from pydub import AudioSegment
-from .utils import Watchdog, SilenceError, ConfigurationError, parse_message
+from .mumble import MumbleConnector
+from .icecast import IcecastConnector
+from .utils import Watchdog, SilenceError, ConfigurationError, parse_message, BUFFER_DURATION, WATCHDOG_RATE, NUM_CHANNELS, MAX_SILENCE_DURATION
 
-SAMPLES_PER_SECOND = 48000
-NUM_CHANNELS = 1
-MAX_SILENCE_DURATION = 30*1000 #30 seconds
-BUFFER_DURATION = 10 # ms Must be 10ms or a multiple thereof
-WATCHDOG_RATE = 5 # ms
-
-
-class MumbleConnector:
-    def __init__(self, server, port, username, password, channel):
-        self.channel = channel
-        self.mumble = pymumble.Mumble(server, username,
-                                      port, password,
-                                      reconnect=True)
-        self.logger = logging.getLogger(__name__)
-        self.silence_count = 0
-
-    def start(self):
-        self.mumble.start()
-        self.mumble.is_ready()
-        self.mumble.callbacks.set_callback(
-            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
-            self.start)
-        self.logger.info('Mumble client started')
-        channel = self.mumble.channels.find_by_name(self.channel)
-        if channel == None:
-            self.logger.error(f'Unable to find channel {self.channel}')
-        else:
-            channel.move_in()
-
-    def stop(self):
-        self.mumble.callbacks.remove_callback(
-            pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
-            self.start)
-        self.mumble.stop()
-        self.logger.info('Disconnected from Mumble')
-
-    def set_message_callback(self, fn):
-        self.mumble.callbacks.set_callback(
-            pymumble.constants.PYMUMBLE_CLBK_TEXTMESSAGERECEIVED,
-            fn)
-
-    def set_get_sound(self, receive):
-        self.logger.debug('Reset silence count')
-        self.silence_count = 0
-        self.mumble.set_receive_sound(receive)
-
-    def send_message(self, message):
-        self.logger.debug(f'Sending message {message} to mumble channel')
-        self.mumble.my_channel().send_text_message(message)
-
-    def get_audio(self, buffer_size):
-        self.logger.debug('Fetching mumble audio')
-        audio_length = buffer_size/1000
-        audio = AudioSegment.silent(duration=buffer_size, frame_rate=SAMPLES_PER_SECOND)
-        silence = True
-        for session_id, user in self.mumble.users.items():
-            user_audio = user.sound
-            if user_audio.is_sound():
-                silence = False
-                audio_data = AudioSegment(
-                    data=user_audio.get_sound(audio_length).pcm,
-                    sample_width=2, # bytes => 16 bit
-                    frame_rate=SAMPLES_PER_SECOND,
-                    channels=1
-                )
-                audio = audio.overlay(audio_data)
-        if NUM_CHANNELS == 2:
-            audio = AudioSegment.from_mono_audiosegments(audio, audio)
-        if silence:
-            self.logger.debug(f'Silence detected from Mumble for {buffer_size}ms')
-            self.silence_count = self.silence_count + buffer_size
-        else:
-            self.silence_count = 0
-        if self.silence_count > MAX_SILENCE_DURATION:
-            self.silence_count = 0
-            raise SilenceError()
-        return audio.raw_data
-
-
-class IcecastConnector:
-    def __init__(self, server, port, username, password, mount_point):
-        self.logger = logging.getLogger(__name__)
-        self.icecast_string = f'icecast://{username}:{password}@{server}:{port}{mount_point}'
-        self.icecast_stream = None
-        self.is_connected = False
-
-    def start(self):
-        args = (
-            ffmpeg
-            .input('pipe:', format='s16le', ar=SAMPLES_PER_SECOND, ac=NUM_CHANNELS)
-            .output(self.icecast_string,
-                    codec="libmp3lame",
-                    f='mp3',
-                    ac=2,
-                    legacy_icecast=1,
-                    sample_fmt='fltp',
-                    content_type='audio/mpeg',
-                    **{
-                        'b:a': '132k',
-                    })
-            .compile()
-        )
-        args.insert(1, '-re')
-        self.icecast_stream = subprocess.Popen(args, stdin=subprocess.PIPE)
-        self.logger.info('Icecast stream started')
-        self.is_connected = True
-
-    def write(self, pcm):
-        if self.icecast_stream.poll():
-            self.logger.warning('Icecast stream disconnected unexpectedly, reconnecting...')
-            self.is_connected = False
-            self.start()
-        self.logger.debug('Writing data to FFMpeg')
-        try:
-            self.icecast_stream.stdin.write(pcm)
-        except ValueError:
-            self.logger.debug('Attempted to write to closed Icecast stream')
-            self.is_connected = False
-
-    def stop(self):
-        if self.icecast_stream:
-            self.icecast_stream.stdin.close()
-        self.logger.info('Disconnected from Icecast')
-        self.is_connected = False
 
 class Bot:
     def __init__(self, mumble, icecast, command_prefix):
@@ -186,7 +59,7 @@ class Bot:
             msg = msg.split(' ')
             cmd = self.commands.get(msg[0])
             if cmd == None:
-                self.logger.debug(f'Not recognized command: {self.command_prefix}{message.message}')
+                self.logger.debug(f'Not recognized command: {message.message}')
                 self.mumble.send_message('Command not recognised')
                 return
             cmd()
