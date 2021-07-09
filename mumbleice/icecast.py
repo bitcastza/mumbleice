@@ -58,6 +58,10 @@ class IcecastConnector:
         except ValueError:
             self.logger.debug('Attempted to write to closed Icecast stream')
             self.is_connected = False
+        except BrokenPipeError as e:
+            self.logger.warning('Icecast disappeared unexpectedly')
+            self.disconnect_icecast()
+            raise e
 
     def stop(self):
         if self.icecast_stream:

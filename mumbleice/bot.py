@@ -80,6 +80,8 @@ class Bot:
             self.icecast.stop()
             self.mumble.send_message('Icecast streaming stopped')
             self.mumble.set_get_sound(False)
+            # Ensure that the timer has stopped and will not restart
+            self.timer.stop()
         else:
             self.mumble.send_message('Icecast already disconnected')
 
@@ -91,6 +93,9 @@ class Bot:
         except SilenceError:
             self.logger.warning(f'No audio received from Mumble for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
             self.mumble.send_message(f'No audio received for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
+            self.disconnect_icecast()
+        except BrokenPipeError:
+            self.mumble.send_message('Icecast disconnected unexpectedly. Streaming stopped')
             self.disconnect_icecast()
 
     def show_icecast_status(self):
