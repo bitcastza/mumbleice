@@ -21,6 +21,9 @@ from .utils import SilenceError, SAMPLES_PER_SECOND, NUM_CHANNELS, MAX_SILENCE_D
 
 class MumbleConnector:
     def __init__(self, server, port, username, password, channel):
+        self.server = server
+        self.username = username
+        self.password = password
         self.channel = channel
         self.mumble = pymumble.Mumble(server, username,
                                       port, password,
@@ -31,15 +34,23 @@ class MumbleConnector:
     def start(self):
         self.mumble.start()
         self.mumble.is_ready()
+        #TODO: Crashes with RuntimeError("threads can only be started once")
         self.mumble.callbacks.set_callback(
             pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
-            self.start)
+            self.restart)
         self.logger.info('Mumble client started')
         channel = self.mumble.channels.find_by_name(self.channel)
         if channel == None:
             self.logger.error(f'Unable to find channel {self.channel}')
         else:
             channel.move_in()
+
+    def restart(self):
+        self.mumble = pymumble.Mumble(self.server, self.username,
+                                      self.port, self.password,
+                                      reconnect=True)
+        self.silence_count = 0
+        self.start()
 
     def stop(self):
         self.mumble.callbacks.remove_callback(
