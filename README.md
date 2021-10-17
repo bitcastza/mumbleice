@@ -26,6 +26,9 @@ docker run -e MUMBLE_SERVER=mumble.server bitcast/mumbleice:dev
 * **MUMBLE_CHANNEL**: The Mumble channel to join. Defaults to `Root`.
 * **MUMBLE_COMMAND_PREFIX**: The command prefix that identifies commands to the
   bot. Defaults to `!`.
+* **MUMBLE_MAX_SILENCE**: The number of seconds of silence in Mumble required
+  before the Icecast stream is disconnected. A value less than 0 implies that
+  the connection will never be disconnected. Defaults to `30`.
 * **ICECAST_SERVER**: The Icecast server to connect to.
 * **ICECAST_PORT**: The port which the Icecast server uses. Defaults to `8000`.
 * **ICECAST_USERNAME**: The username to authenticate against Icecast with.
@@ -34,6 +37,8 @@ docker run -e MUMBLE_SERVER=mumble.server bitcast/mumbleice:dev
   Defaults to `hackme`.
 * **ICECAST_MOUNT_POINT**: The mount point to use for streaming audio. Defaults
   to `/mumble`.
+* **ICECAST_AUTOCONNECT**: Automatically start streaming to Icecast once it is
+  connected to Mumble. Defaults to `false`.
 
 ## Development
 

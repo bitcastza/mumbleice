@@ -6,10 +6,10 @@ mumble:
   channel: !ENV ${MUMBLE_CHANNEL:Root}
   command_prefix: !ENV ${MUMBLE_COMMAND_PREFIX:!}
   autoconnect: !ENV ${MUMBLE_AUTOCONNECT:false}
-  max_silence: !ENV ${MUMBLE_MAX_SILENCE:30}
 icecast:
   server: !ENV ${ICECAST_SERVER}
   port: !ENV ${ICECAST_PORT:8000}
   username: !ENV ${ICECAST_USERNAME:source}
   password: !ENV ${ICECAST_PASSWORD:hackme}
   mount_point: !ENV ${ICECAST_MOUNT_POINT:/mumble}
+  max_silence: !ENV ${MUMBLE_MAX_SILENCE:30}

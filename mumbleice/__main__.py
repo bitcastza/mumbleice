@@ -54,7 +54,7 @@ def run():
                                    cfg.mount_point)
 
         bot = Bot(mumble, icecast, config.mumble.command_prefix,
-                                   config.mumble.autoconnect)
+                                   config.icecast.autoconnect)
         bot.run()
     except KeyError:
         logger.error('Error reading config file')
