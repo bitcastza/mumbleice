@@ -5,6 +5,8 @@ mumble:
   password: server-password
   channel: Root
   command_prefix: '!'
+  autoconnect: false
+  max_silence: 30
 icecast:
   server: icecast.server
   port: 8000

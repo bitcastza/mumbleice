@@ -47,13 +47,14 @@ def run():
         cfg = config.mumble
         mumble = MumbleConnector(cfg.server, int(cfg.port),
                                  cfg.username, cfg.password,
-                                 cfg.channel)
+                                 cfg.channel, int(cfg.max_silence))
         cfg = config.icecast
         icecast = IcecastConnector(cfg.server, int(cfg.port),
                                    cfg.username, cfg.password,
                                    cfg.mount_point)
 
-        bot = Bot(mumble, icecast, config.mumble.command_prefix)
+        bot = Bot(mumble, icecast, config.mumble.command_prefix,
+                                   config.mumble.autoconnect)
         bot.run()
     except KeyError:
         logger.error('Error reading config file')

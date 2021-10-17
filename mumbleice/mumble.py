@@ -20,7 +20,15 @@ from .utils import SilenceError, SAMPLES_PER_SECOND, NUM_CHANNELS, MAX_SILENCE_D
 
 
 class MumbleConnector:
-    def __init__(self, server, port, username, password, channel):
+    def __init__(
+        self,
+        server,
+        port,
+        username,
+        password,
+        channel,
+        max_silence=MAX_SILENCE_DURATION,
+    ):
         self.server = server
         self.username = username
         self.password = password
@@ -30,6 +38,7 @@ class MumbleConnector:
                                       reconnect=True)
         self.logger = logging.getLogger(__name__)
         self.silence_count = 0
+        self.max_silence = max_silence * 1000 # ms
 
     def start(self):
         self.mumble.start()
@@ -91,12 +100,14 @@ class MumbleConnector:
                 audio = audio.overlay(audio_data)
         if NUM_CHANNELS == 2:
             audio = AudioSegment.from_mono_audiosegments(audio, audio)
-        if silence:
-            self.logger.debug(f'Silence detected from Mumble for {buffer_size}ms')
-            self.silence_count = self.silence_count + buffer_size
-        else:
-            self.silence_count = 0
-        if self.silence_count > MAX_SILENCE_DURATION:
-            self.silence_count = 0
-            raise SilenceError()
+
+        if self.max_silence > 0:
+            if silence:
+                self.logger.debug(f'Silence detected from Mumble for {buffer_size}ms')
+                self.silence_count = self.silence_count + buffer_size
+            else:
+                self.silence_count = 0
+            if self.silence_count > self.max_silence:
+                self.silence_count = 0
+                raise SilenceError()
         return audio.raw_data

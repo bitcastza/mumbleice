@@ -17,11 +17,11 @@ import logging
 import time
 from .mumble import MumbleConnector
 from .icecast import IcecastConnector
-from .utils import Watchdog, SilenceError, ConfigurationError, parse_message, BUFFER_DURATION, WATCHDOG_RATE, NUM_CHANNELS, MAX_SILENCE_DURATION
+from .utils import Watchdog, SilenceError, ConfigurationError, parse_message, BUFFER_DURATION, WATCHDOG_RATE, NUM_CHANNELS
 
 
 class Bot:
-    def __init__(self, mumble, icecast, command_prefix):
+    def __init__(self, mumble, icecast, command_prefix, autoconnect=False):
         if BUFFER_DURATION % 10 != 0:
             raise ConfigurationError('BUFFER_DURATION must be 10ms or a multiple thereof')
         if NUM_CHANNELS not in [1, 2]:
@@ -36,6 +36,7 @@ class Bot:
             'disconnect': self.disconnect_icecast,
             'status': self.show_icecast_status,
         }
+        self._autoconnect = autoconnect
         self.timer = Watchdog(WATCHDOG_RATE/1000, self.write_audio)
 
     def run(self):
@@ -44,6 +45,10 @@ class Bot:
         self.mumble.start()
         self.logger.info('Connected to Mumble')
         self.logger.info('Started MumbleIce bot')
+
+        if self._autoconnect:
+            self.connect_icecast()
+
         try:
             while True:
                 time.sleep(1)
@@ -91,8 +96,8 @@ class Bot:
             self.icecast.write(audio)
             self.timer.reset()
         except SilenceError:
-            self.logger.warning(f'No audio received from Mumble for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
-            self.mumble.send_message(f'No audio received for the last {MAX_SILENCE_DURATION/1000} s. Disconnecting from Icecast...')
+            self.logger.warning(f'No audio received from Mumble for the last {self.mumble.max_silence} s. Disconnecting from Icecast...')
+            self.mumble.send_message(f'No audio received for the last {self.mumble.max_silence} s. Disconnecting from Icecast...')
             self.disconnect_icecast()
         except BrokenPipeError:
             self.mumble.send_message('Icecast disconnected unexpectedly. Streaming stopped')
