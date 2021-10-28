@@ -30,6 +30,7 @@ class MumbleConnector:
         max_silence=MAX_SILENCE_DURATION,
     ):
         self.server = server
+        self.port = port
         self.username = username
         self.password = password
         self.channel = channel
@@ -48,11 +49,11 @@ class MumbleConnector:
             pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
             self.restart)
         self.logger.info('Mumble client started')
-        channel = self.mumble.channels.find_by_name(self.channel)
-        if channel == None:
-            self.logger.error(f'Unable to find channel {self.channel}')
-        else:
+        try:
+            channel = self.mumble.channels.find_by_name(self.channel)
             channel.move_in()
+        except pymumble.errors.UnknownChannelError:
+            self.logger.error(f'Unable to find channel {self.channel}')
 
     def restart(self):
         self.mumble = pymumble.Mumble(self.server, self.username,
@@ -64,7 +65,7 @@ class MumbleConnector:
     def stop(self):
         self.mumble.callbacks.remove_callback(
             pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
-            self.start)
+            self.restart)
         self.mumble.stop()
         self.logger.info('Disconnected from Mumble')
 
