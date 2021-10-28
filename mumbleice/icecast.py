@@ -40,6 +40,7 @@ class IcecastConnector:
                     **{
                         'b:a': '132k',
                     })
+            .global_args('-hide_banner')
             .compile()
         )
         args.insert(1, '-re')
