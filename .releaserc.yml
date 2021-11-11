@@ -1,6 +1,5 @@
 branches:
   - master
-  - feature/semantic-release
 extends: '@semantic-release/gitlab-config'
 tagFormat: '${version}'
 plugins:
