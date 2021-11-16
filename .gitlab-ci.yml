@@ -36,5 +36,4 @@ semantic-release:
   script:
     - semantic-release
   only:
-    - master
     - schedules
