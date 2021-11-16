@@ -32,7 +32,7 @@ semantic-release:
   before_script:
     - docker build --tag $CI_REGISTRY_IMAGE:latest .
     - apk add nodejs npm git python3 py3-pip py3-setuptools py3-wheel py3-twine
-    - npm install --legacy-peer-deps -g semantic-release @semantic-release/gitlab-config @semantic-release/changelog semantic-release-pypi==2.4.2 @semantic-release/exec @semantic-release-plus/docker
+    - npm install --legacy-peer-deps -g semantic-release @semantic-release/gitlab-config @semantic-release/changelog semantic-release-pypi@2.4.2 @semantic-release/exec @semantic-release-plus/docker
   script:
     - semantic-release
   only:
