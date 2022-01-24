@@ -77,6 +77,7 @@ class Bot:
             self.icecast.start()
             self.mumble.set_get_sound(True)
             self.mumble.send_message('Icecast stream started')
+            self.mumble.send_audio("assets/streaming_started.wav")
             self.timer.start()
 
     def disconnect_icecast(self):
@@ -84,6 +85,7 @@ class Bot:
         if self.icecast.is_connected:
             self.icecast.stop()
             self.mumble.send_message('Icecast streaming stopped')
+            self.mumble.send_audio("assets/streaming_stopped.wav")
             self.mumble.set_get_sound(False)
             # Ensure that the timer has stopped and will not restart
             self.timer.stop()

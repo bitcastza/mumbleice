@@ -17,6 +17,7 @@ import logging
 import pymumble_py3 as pymumble
 from pydub import AudioSegment
 from .utils import SilenceError, SAMPLES_PER_SECOND, NUM_CHANNELS, MAX_SILENCE_DURATION
+import subprocess
 
 
 class MumbleConnector:
@@ -82,6 +83,15 @@ class MumbleConnector:
     def send_message(self, message):
         self.logger.debug(f'Sending message {message} to mumble channel')
         self.mumble.my_channel().send_text_message(message)
+
+    def send_audio(self, filename):
+        command = ["ffmpeg", "-i", filename, "-acodec", "pcm_s16le", "-f", "s16le", "-ac", "1", "-ar", "48000", "-"]
+        sound = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=1024)
+        while True:
+            raw_music = sound.stdout.read(1024)
+            if not raw_music:
+                break
+            self.mumble.sound_output.add_sound(raw_music)
 
     def get_audio(self, buffer_size):
         self.logger.debug('Fetching mumble audio')
