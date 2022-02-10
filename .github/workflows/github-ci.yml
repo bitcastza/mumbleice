@@ -1,0 +1,33 @@
+jobs:
+  docker-dev-image:
+    runs-on: ubuntu-latest
+    container: docker:20
+    services:
+      docker:
+        image: docker
+        env:
+          DOCKER_DRIVER: overlay2
+
+    steps:
+      - name: Check out repositrory code
+        uses: actions/checkout@v2
+
+      - name: Docker commands
+        run: |
+          - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $CI_REGISTRY
+          - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:dev .
+          - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+          - docker push $CI_REGISTRY_IMAGE:dev
+
+  semantic-release:
+    runs-on: ubuntu-latest
+      container: docker:20
+      services:
+        docker:
+          image: docker:20
+          env:
+            DOCKER_DRIVER: overlay2
+
+      steps:
+        - name: Checkout repository code
+          uses: actions/checkout@v2
