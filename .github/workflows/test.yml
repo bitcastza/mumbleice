@@ -5,6 +5,8 @@ on: [push, pull_request]
 jobs:
   docker-dev-image:
     runs-on: ubuntu-latest
+    env:
+      CI_REGISTRY_IMAGE: bitcast/mumbleice 
     container: docker:20
     
     services:
@@ -29,4 +31,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mumbleice:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ CI_REGISTRY_IMAGE}}:dev
