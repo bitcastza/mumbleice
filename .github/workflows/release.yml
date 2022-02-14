@@ -1,0 +1,25 @@
+name: "Release npm package"
+on:
+  schedule:
+  - cron: "0 0 1 * *"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+      container: docker:20
+      
+      services:
+        docker:
+          image: docker:20-dind
+          env:
+            DOCKER_DRIVER: overlay2
+
+      steps:
+        - name: semantic-release
+        - uses: actions/checkout@v2
+        - uses: ./.github/workflows/composite-action
+        - run: |
+            - docker build --tag $CI_REGISTRY_IMAGE:latest .
+            - apk add nodejs npm git python3 py3-pip py3-setuptools py3-wheel py3-twine
+            - npm install --legacy-peer-deps -g semantic-release @semantic-release/gitlab-config @semantic-release/changelog semantic-release-pypi@2.4.2 @semantic-release/exec @semantic-release-plus/docker

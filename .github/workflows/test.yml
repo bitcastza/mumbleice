@@ -1,10 +1,15 @@
+on: [push, pull_request]
+  branches:
+  - master
+
 jobs:
   docker-dev-image:
     runs-on: ubuntu-latest
     container: docker:20
+    
     services:
       docker:
-        image: docker
+        image: docker:20-dind
         env:
           DOCKER_DRIVER: overlay2
 
@@ -18,16 +23,3 @@ jobs:
           - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:dev .
           - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
           - docker push $CI_REGISTRY_IMAGE:dev
-
-  semantic-release:
-    runs-on: ubuntu-latest
-      container: docker:20
-      services:
-        docker:
-          image: docker:20
-          env:
-            DOCKER_DRIVER: overlay2
-
-      steps:
-        - name: Checkout repository code
-          uses: actions/checkout@v2
