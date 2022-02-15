@@ -1,6 +1,11 @@
-on: [push, pull_request]
-  branches:
-  - master
+on:
+  push:
+    branches:
+    - master
+  
+  pull:
+    branhes:
+    - master
 
 jobs:
   docker-dev-image:
@@ -14,7 +19,7 @@ jobs:
         name: Build & push Docker image
         with:
           image: {{ secrets.CI_REGISTRY_IMAGE }}
-          tags: dev, {{ github.sha }}
+          tags: dev, ${{ github.sha }}
           registry: dockerhub.io
           dockerfile: ./Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
