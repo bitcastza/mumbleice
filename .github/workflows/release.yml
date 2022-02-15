@@ -8,12 +8,11 @@ jobs:
     name: Release
 
       steps:
-        - name: semantic-release
-        - uses: actions/checkout@v2
-        - uses: cycjimmy/semantic-release-action@v2
+        - name: Checkout
+          uses: actions/checkout@v2
+        
+        - name: Semantic Release
+          uses: cycjimmy/semantic-release-action@v2
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - run: |
-            - docker build --tag $CI_REGISTRY_IMAGE:latest .
-            - apk add nodejs npm git python3 py3-pip py3-setuptools py3-wheel py3-twine
-            - npm install --legacy-peer-deps -g semantic-release @semantic-release/gitlab-config @semantic-release/changelog semantic-release-pypi@2.4.2 @semantic-release/exec @semantic-release-plus/docker
+ 
