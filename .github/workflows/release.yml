@@ -1,4 +1,4 @@
-name: "Release npm package"
+name: "Release"
 on:
   schedule:
   - cron: "0 0 1 * *"
@@ -6,19 +6,13 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
-      container: docker:20
-      
-      services:
-        docker:
-          image: docker:20-dind
-          env:
-            DOCKER_DRIVER: overlay2
 
       steps:
         - name: semantic-release
         - uses: actions/checkout@v2
-        - uses: ./.github/workflows/composite-action
+        - uses: cycjimmy/semantic-release-action@v2
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         - run: |
             - docker build --tag $CI_REGISTRY_IMAGE:latest .
             - apk add nodejs npm git python3 py3-pip py3-setuptools py3-wheel py3-twine

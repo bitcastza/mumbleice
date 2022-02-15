@@ -5,16 +5,7 @@ on: [push, pull_request]
 jobs:
   docker-dev-image:
     runs-on: ubuntu-latest
-    env:
-      CI_REGISTRY_IMAGE: bitcast/mumbleice 
-    container: docker:20
     
-    services:
-      docker:
-        image: docker:20-dind
-        env:
-          DOCKER_DRIVER: overlay2
-
     steps:
       - name: Check out repositrory code
         uses: actions/checkout@v2
