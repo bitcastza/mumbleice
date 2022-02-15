@@ -20,7 +20,7 @@ jobs:
         with:
           image: {{ secrets.CI_REGISTRY_IMAGE }}
           tags: dev, ${{ github.sha }}
-          registry: dockerhub.io
+          registry: docker.io
           dockerfile: ./Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
