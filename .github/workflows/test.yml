@@ -1,11 +1,11 @@
 on:
   push:
     branches:
-    - master
+      - master
   
   pull:
     branches:
-    - master
+      - master
 
 jobs:
   docker-dev-image:
