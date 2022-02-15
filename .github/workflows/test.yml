@@ -4,7 +4,7 @@ on:
     - master
   
   pull:
-    branhes:
+    branches:
     - master
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
         with:
-          image: {{ secrets.CI_REGISTRY_IMAGE }}
+          image: ${{ secrets.CI_REGISTRY_IMAGE }}
           tags: dev, ${{ github.sha }}
           registry: docker.io
           dockerfile: ./Dockerfile
