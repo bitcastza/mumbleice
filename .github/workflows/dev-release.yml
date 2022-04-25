@@ -1,13 +1,12 @@
+Name: Docker
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
   docker-dev-image:
+    name: Dev image
     runs-on: ubuntu-latest
     steps:
       - name: Check out repositrory code
