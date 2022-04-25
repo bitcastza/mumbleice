@@ -1,16 +1,15 @@
 on:
   push:
     branches:
-      - master
-  
+      - main
+
   pull:
     branches:
-      - master
+      - main
 
 jobs:
   docker-dev-image:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Check out repositrory code
         uses: actions/checkout@v2
