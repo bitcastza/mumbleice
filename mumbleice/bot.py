@@ -15,6 +15,7 @@
 ###########################################################################
 import logging
 import time
+from importlib.resources import files, as_file
 from .mumble import MumbleConnector
 from .icecast import IcecastConnector
 from .utils import Watchdog, SilenceError, ConfigurationError, parse_message, BUFFER_DURATION, WATCHDOG_RATE, NUM_CHANNELS
@@ -77,7 +78,9 @@ class Bot:
             self.icecast.start()
             self.mumble.set_get_sound(True)
             self.mumble.send_message('Icecast stream started')
-            self.mumble.send_audio("assets/streaming_started.wav")
+            audio_file = files('mumbleice').joinpath('resources').joinpath('streaming_started.wav')
+            with as_file(audio_file) as audio:
+                self.mumble.send_audio(audio.resolve())
             self.timer.start()
 
     def disconnect_icecast(self):
@@ -85,7 +88,9 @@ class Bot:
         if self.icecast.is_connected:
             self.icecast.stop()
             self.mumble.send_message('Icecast streaming stopped')
-            self.mumble.send_audio("assets/streaming_stopped.wav")
+            audio_file = files('mumbleice').joinpath('resources').joinpath('streaming_stopped.wav')
+            with as_file(audio_file) as audio:
+                self.mumble.send_audio(audio.resolve())
             self.mumble.set_get_sound(False)
             # Ensure that the timer has stopped and will not restart
             self.timer.stop()

@@ -42,6 +42,8 @@ docker run -e MUMBLE_SERVER=mumble.server bitcast/mumbleice:dev
 
 ## Development
 
+Mumbleice requires Python 3.7 or later.
+
 ```bash
 sudo apt install python3-dev python3-pip libopus0 virtualenv
 virtualenv -p python3 pyenv

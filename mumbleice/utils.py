@@ -14,6 +14,7 @@
 # along with MumbleIce. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import re
+from contextlib import contextmanager
 from threading import Timer
 
 SAMPLES_PER_SECOND = 48000
@@ -61,3 +62,16 @@ class ConfigurationError(Exception):
 def parse_message(message):
     message = re.sub('<[^<]+?>', '', message)
     return message.lower()
+
+@contextmanager
+def read_file_buffer(filename, buffer_size):
+    f = open(filename, 'rb')
+    try:
+        def gen():
+            b = f.read(buffer_size)
+            while b:
+                yield b
+                b = f.read(buffer_size)
+        yield gen()
+    finally:
+        f.close()
