@@ -1,11 +1,10 @@
 branches:
   - main
-extends: '@semantic-release/gitlab-config'
 tagFormat: '${version}'
 plugins:
   - '@semantic-release/commit-analyzer'
   - '@semantic-release/release-notes-generator'
   - '@semantic-release/changelog'
-  - '@semantic-release/gitlab'
+  - '@semantic-release/github'
   - 'semantic-release-pypi'
   - ['@semantic-release-plus/docker', { name: bitcast/mumbleice }]
