@@ -1,6 +1,9 @@
 /mumbleice.yml
-build/
 __pycache__/
-.git
-*.egg-info/
+build/
 pyenv/
+.git
+.github
+.gitignore
+.releaserc.yml
+*.egg-info/
