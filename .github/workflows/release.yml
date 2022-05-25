@@ -20,3 +20,6 @@ jobs:
             @semantic-release-plus/docker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
