@@ -49,6 +49,6 @@ sudo apt install python3-dev python3-pip libopus0 virtualenv
 virtualenv -p python3 pyenv
 pyenv/bin/pip install -e .
 cp mumbleice.yml.example mumbleice.yml
-# Configure MumbleIce to connect to your mumble and icecast servers
-pyenv/bin/mumbleice
+# Configure MumbleIce to connect to your mumble and Icecast servers
+pyenv/bin/mumbleice -c mumbleice.yml
 ```
