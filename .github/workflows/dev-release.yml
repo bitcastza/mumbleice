@@ -1,4 +1,4 @@
-name: Docker
+name: Development Release
 on:
   push:
     branches:
@@ -6,10 +6,10 @@ on:
 
 jobs:
   docker-dev-image:
-    name: Dev image
+    name: Image
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repositrory code
+      - name: Check out repository code
         uses: actions/checkout@v3
 
       - uses: mr-smithers-excellent/docker-build-push@v5
