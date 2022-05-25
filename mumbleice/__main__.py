@@ -53,8 +53,10 @@ def run():
                                    cfg.username, cfg.password,
                                    cfg.mount_point)
 
-        bot = Bot(mumble, icecast, config.mumble.command_prefix,
-                                   config.icecast.autoconnect)
+        # Required because pyaml_env environment variables are returned as
+        # strings, regardless of actual type
+        autoconnect = str(config.icecast.autoconnect).lower() in ['true', 'yes']
+        bot = Bot(mumble, icecast, config.mumble.command_prefix, autoconnect)
         bot.run()
     except KeyError:
         logger.error('Error reading config file')

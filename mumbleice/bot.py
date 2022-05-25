@@ -37,7 +37,7 @@ class Bot:
             'disconnect': self.disconnect_icecast,
             'status': self.show_icecast_status,
         }
-        self._autoconnect = autoconnect
+        self.autoconnect = autoconnect
         self.timer = Watchdog(WATCHDOG_RATE/1000, self.write_audio)
 
     def run(self):
@@ -47,7 +47,7 @@ class Bot:
         self.logger.info('Connected to Mumble')
         self.logger.info('Started MumbleIce bot')
 
-        if self._autoconnect:
+        if self.autoconnect:
             self.connect_icecast()
 
         try:

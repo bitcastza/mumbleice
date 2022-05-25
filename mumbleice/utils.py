@@ -18,7 +18,7 @@ from contextlib import contextmanager
 from threading import Timer
 
 SAMPLES_PER_SECOND = 48000
-NUM_CHANNELS = 1
+NUM_CHANNELS = 2
 MAX_SILENCE_DURATION = 30 # seconds
 BUFFER_DURATION = 10 # ms Must be 10ms or a multiple thereof
 WATCHDOG_RATE = 5 # ms
