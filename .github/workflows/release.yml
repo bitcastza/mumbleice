@@ -17,12 +17,22 @@ jobs:
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
+        id: semantic
         with:
           extra_plugins: |
             semantic-release-pypi
-            @semantic-release-plus/docker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker image
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          image: ${{ secrets.CI_REGISTRY_IMAGE }}
+          tags: ${{ steps.semantic.outputs.new_release_version }}, latest
+          registry: docker.io
+          dockerfile: ./Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
