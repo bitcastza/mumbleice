@@ -1,0 +1,6 @@
+/mumbleice.yml
+build/
+__pycache__/
+.git
+*.egg-info/
+pyenv/
