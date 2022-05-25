@@ -14,5 +14,9 @@ jobs:
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
+        with:
+          extra_plugins: |
+            semantic-release-pypi
+            @semantic-release-plus/docker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
