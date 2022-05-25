@@ -12,6 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: sudo apt-get install -y python3 python3-pip python3-setuptools twine
+
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         with:
