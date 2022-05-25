@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 
 RUN apt-get update -qq && apt-get upgrade -y -qq
 RUN apt-get install -y -qq libopus0 ffmpeg
