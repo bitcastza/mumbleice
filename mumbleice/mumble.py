@@ -45,7 +45,6 @@ class MumbleConnector:
     def start(self):
         self.mumble.start()
         self.mumble.is_ready()
-        #TODO: Crashes with RuntimeError("threads can only be started once")
         self.mumble.callbacks.set_callback(
             pymumble.constants.PYMUMBLE_CLBK_DISCONNECTED,
             self.restart)
@@ -57,6 +56,7 @@ class MumbleConnector:
             self.logger.error(f'Unable to find channel {self.channel}')
 
     def restart(self):
+        self.logger.info('Reconnecting to Mumble')
         self.mumble = pymumble.Mumble(self.server, self.username,
                                       self.port, self.password,
                                       reconnect=True)
