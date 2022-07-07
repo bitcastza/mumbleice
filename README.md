@@ -46,9 +46,10 @@ docker run -e MUMBLE_SERVER=mumble.server bitcast/mumbleice:dev
 Mumbleice requires Python 3.9 or later.
 
 ```bash
-sudo apt install python3-dev python3-pip libopus0 virtualenv
+sudo apt install python3-dev python3-pip libopus0 virtualenv pre-commit
 virtualenv -p python3 pyenv
 pyenv/bin/pip install -e .
+pre-commit install
 cp mumbleice.yml.example mumbleice.yml
 # Configure MumbleIce to connect to your mumble and Icecast servers
 pyenv/bin/mumbleice -c mumbleice.yml
