@@ -5,6 +5,7 @@ This is a mumble bot for streaming audio from a Mumble room to Icecast.
 # Installing
 
 ## Production (Docker)
+
 The Docker image is recommended for running in production. The configuration
 file can be mounted to `/mumbleice.yml` or configuration can be done using
 environment variables. The file location can be changed with the
@@ -18,26 +19,26 @@ docker run -e MUMBLE_SERVER=mumble.server bitcast/mumbleice:dev
 
 ### Environment Variables
 
-* **MUMBLE_SERVER**: The Mumble server to connect to.
-* **MUMBLE_PORT**: The port which the Mumble server uses. Defaults to `64738`.
-* **MUMBLE_USERNAME**: The username for the bot on Mumble. Defaults to
+- **MUMBLE_SERVER**: The Mumble server to connect to.
+- **MUMBLE_PORT**: The port which the Mumble server uses. Defaults to `64738`.
+- **MUMBLE_USERNAME**: The username for the bot on Mumble. Defaults to
   `live-streamer`.
-* **MUMBLE_PASSWORD**: The server password.
-* **MUMBLE_CHANNEL**: The Mumble channel to join. Defaults to `Root`.
-* **MUMBLE_COMMAND_PREFIX**: The command prefix that identifies commands to the
+- **MUMBLE_PASSWORD**: The server password.
+- **MUMBLE_CHANNEL**: The Mumble channel to join. Defaults to `Root`.
+- **MUMBLE_COMMAND_PREFIX**: The command prefix that identifies commands to the
   bot. Defaults to `!`.
-* **MUMBLE_MAX_SILENCE**: The number of seconds of silence in Mumble required
+- **MUMBLE_MAX_SILENCE**: The number of seconds of silence in Mumble required
   before the Icecast stream is disconnected. A value less than 0 implies that
   the connection will never be disconnected. Defaults to `30`.
-* **ICECAST_SERVER**: The Icecast server to connect to.
-* **ICECAST_PORT**: The port which the Icecast server uses. Defaults to `8000`.
-* **ICECAST_USERNAME**: The username to authenticate against Icecast with.
+- **ICECAST_SERVER**: The Icecast server to connect to.
+- **ICECAST_PORT**: The port which the Icecast server uses. Defaults to `8000`.
+- **ICECAST_USERNAME**: The username to authenticate against Icecast with.
   Defaults to `source`.
-* **ICECAST_PASSWORD**: The password to authenticate against Icecast with.
+- **ICECAST_PASSWORD**: The password to authenticate against Icecast with.
   Defaults to `hackme`.
-* **ICECAST_MOUNT_POINT**: The mount point to use for streaming audio. Defaults
+- **ICECAST_MOUNT_POINT**: The mount point to use for streaming audio. Defaults
   to `/mumble`.
-* **ICECAST_AUTOCONNECT**: Automatically start streaming to Icecast once it is
+- **ICECAST_AUTOCONNECT**: Automatically start streaming to Icecast once it is
   connected to Mumble. Defaults to `false`.
 
 ## Development

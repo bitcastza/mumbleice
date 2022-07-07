@@ -1,3 +1,3 @@
 from setuptools import setup, find_packages
 
-setup(name='mumbleice')
+setup(name="mumbleice")

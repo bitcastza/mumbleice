@@ -19,9 +19,10 @@ from threading import Timer
 
 SAMPLES_PER_SECOND = 48000
 NUM_CHANNELS = 2
-MAX_SILENCE_DURATION = 30 # seconds
-BUFFER_DURATION = 10 # ms Must be 10ms or a multiple thereof
-WATCHDOG_RATE = 5 # ms
+MAX_SILENCE_DURATION = 30  # seconds
+BUFFER_DURATION = 10  # ms Must be 10ms or a multiple thereof
+WATCHDOG_RATE = 5  # ms
+
 
 class Watchdog(Exception):
     def __init__(self, timeout, handler=None):
@@ -60,18 +61,21 @@ class ConfigurationError(Exception):
 
 
 def parse_message(message):
-    message = re.sub('<[^<]+?>', '', message)
+    message = re.sub("<[^<]+?>", "", message)
     return message.lower()
+
 
 @contextmanager
 def read_file_buffer(filename, buffer_size):
-    f = open(filename, 'rb')
+    f = open(filename, "rb")
     try:
+
         def gen():
             b = f.read(buffer_size)
             while b:
                 yield b
                 b = f.read(buffer_size)
+
         yield gen()
     finally:
         f.close()
