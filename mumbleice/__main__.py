@@ -21,22 +21,30 @@ import sys
 from pyaml_env import parse_config, BaseConfig
 from .bot import Bot, IcecastConnector, MumbleConnector
 
-LOGGING_FORMAT = '%(asctime)s - %(levelname)s (%(name)s): %(message)s'
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+LOGGING_FORMAT = "%(asctime)s - %(levelname)s (%(name)s): %(message)s"
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 
 def run():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config',
-                        help='the configuration file to use',
-                        default=os.environ.get('MUMBLEICE_CONFIG_FILE', 'mumbleice.yml'))
-    parser.add_argument('-v', '--verbose',
-                        help='show debug information',
-                        action='store_true')
+    parser.add_argument(
+        "-c",
+        "--config",
+        help="the configuration file to use",
+        default=os.environ.get("MUMBLEICE_CONFIG_FILE", "mumbleice.yml"),
+    )
+    parser.add_argument(
+        "-v", "--verbose", help="show debug information", action="store_true"
+    )
     args = parser.parse_args()
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG, format=LOGGING_FORMAT, datefmt=DATE_FORMAT)
+        logging.basicConfig(
+            level=logging.DEBUG, format=LOGGING_FORMAT, datefmt=DATE_FORMAT
+        )
     else:
-        logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT, datefmt=DATE_FORMAT)
+        logging.basicConfig(
+            level=logging.INFO, format=LOGGING_FORMAT, datefmt=DATE_FORMAT
+        )
 
     logger = logging.getLogger(__name__)
     try:
@@ -45,27 +53,33 @@ def run():
         config = BaseConfig(parse_config(args.config))
 
         cfg = config.mumble
-        mumble = MumbleConnector(cfg.server, int(cfg.port),
-                                 cfg.username, cfg.password,
-                                 cfg.channel, int(cfg.max_silence))
+        mumble = MumbleConnector(
+            cfg.server,
+            int(cfg.port),
+            cfg.username,
+            cfg.password,
+            cfg.channel,
+            int(cfg.max_silence),
+        )
         cfg = config.icecast
-        icecast = IcecastConnector(cfg.server, int(cfg.port),
-                                   cfg.username, cfg.password,
-                                   cfg.mount_point)
+        icecast = IcecastConnector(
+            cfg.server, int(cfg.port), cfg.username, cfg.password, cfg.mount_point
+        )
 
         # Required because pyaml_env environment variables are returned as
         # strings, regardless of actual type
-        autoconnect = str(config.icecast.autoconnect).lower() in ['true', 'yes']
+        autoconnect = str(config.icecast.autoconnect).lower() in ["true", "yes"]
         bot = Bot(mumble, icecast, config.mumble.command_prefix, autoconnect)
         bot.run()
     except KeyError:
-        logger.error('Error reading config file')
+        logger.error("Error reading config file")
         parser.print_help(file=sys.stderr)
         exit(1)
     except FileNotFoundError:
-        logger.error(f'Config file {args.config} does not exist')
+        logger.error(f"Config file {args.config} does not exist")
         parser.print_help(file=sys.stderr)
         exit(1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

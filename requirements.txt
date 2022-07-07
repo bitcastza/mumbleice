@@ -1,4 +1,4 @@
-pymumble
 ffmpeg-python
-pydub
 pyaml-env
+pydub
+pymumble
