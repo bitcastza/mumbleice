@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.12
 
 RUN apt-get update -qq && apt-get upgrade -y -qq
 RUN apt-get install -y -qq libopus0 ffmpeg
