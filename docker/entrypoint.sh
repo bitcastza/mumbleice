@@ -1,3 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
-python3 -m mumbleice -c $MUMBLEICE_CONFIG_FILE
+main() {
+  if [ "$1" = 'mumbleice' ] && [ "$(id -u)" = '0' ]; then
+    exec gosu mumbleice "$@"
+  fi
+
+  exec "$@"
+}
+
+main "$@"

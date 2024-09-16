@@ -1,19 +1,44 @@
-FROM python:3.12
-
-RUN apt-get update -qq && apt-get upgrade -y -qq
-RUN apt-get install -y -qq libopus0 ffmpeg
-
-ENV MUMBLEICE_CONFIG_FILE=/mumbleice.yml
-
-COPY docker/entrypoint.sh /entrypoint.sh
-COPY docker/mumbleice.yml /mumbleice.yml
+FROM python:3.11.10-slim-bookworm AS build
 
 WORKDIR /app
 
+RUN python -m venv venv
+ENV PATH="/app/venv/bin:$PATH"
+
 COPY requirements.txt ./
+RUN pip install --no-compile --requirement requirements.txt
 
-RUN pip3 install -U pip
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY setup.cfg setup.py pyproject.toml ./
+COPY mumbleice ./mumbleice
 
-COPY ./ /app
-CMD /entrypoint.sh
+RUN pip install --no-compile .
+
+RUN pip uninstall -y \
+      pip \
+      setuptools \
+    ;
+
+FROM python:3.11.10-slim-bookworm
+
+RUN set -eux; \
+      apt-get update; \
+      apt-get install -y --no-install-recommends \
+        ffmpeg \
+        libopus0 \
+        gosu \
+      ; \
+      apt-get clean;
+
+RUN set -eux; \
+      groupadd -r mumbleice; \
+      useradd -r -d /var/mumbleice -s /sbin/nologin -g mumbleice mumbleice;
+
+COPY --from=build /app/venv /app/venv
+
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint
+COPY docker/mumbleice.yml /etc/mumbleice/config.yml
+
+ENV PATH="/app/venv/bin:$PATH"
+
+ENTRYPOINT [ "entrypoint" ]
+CMD [ "mumbleice", "-c", "/etc/mumbleice/config.yml" ]
