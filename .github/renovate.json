@@ -3,5 +3,12 @@
     "config:base",
     ":preserveSemverRanges",
     ":disableDependencyDashboard"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["python"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    }
   ]
 }
