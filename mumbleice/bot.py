@@ -14,7 +14,7 @@
 # along with MumbleIce. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import logging
-import time
+import signal
 from importlib.resources import files, as_file
 from .mumble import MumbleConnector
 from .icecast import IcecastConnector
@@ -39,6 +39,11 @@ class Bot:
             raise ConfigurationError(
                 "NUM_CHANNELS must be 1 (mono) or (stereo). Other values are not supported"
             )
+
+        signal.signal(signal.SIGINT, self.stop)
+        signal.signal(signal.SIGTERM, self.stop)
+        signal.signal(signal.SIGQUIT, self.stop)
+
         self.mumble = mumble
         self.mumble.set_message_callback(self.mumble_message)
         self.icecast = icecast
@@ -62,12 +67,12 @@ class Bot:
         if self.autoconnect:
             self.connect_icecast()
 
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
+    def stop(self, _signal, _frame):
+        if hasattr(self, "timer"):
             self.timer.stop()
+        if hasattr(self, "icecast"):
             self.icecast.stop()
+        if hasattr(self, "mumble"):
             self.mumble.stop()
 
     def mumble_message(self, message):
