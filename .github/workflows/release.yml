@@ -41,7 +41,7 @@ jobs:
 
       - name: Publish Pypi package
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: pypa/gh-action-pypi-publish@v1.11.0
+        uses: pypa/gh-action-pypi-publish@v1.12.0
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
